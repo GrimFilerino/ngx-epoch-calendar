@@ -1,0 +1,13 @@
+<div class="w-screen fixed left-0 top-0 flex items-center">
+    <div class="flex-1/4 justify-self-start">
+        <ng-template></ng-template>
+    </div>
+    <div class="flex-1/2 justify-self-center">
+        <i class="ph" (click)="datePrev()">caret-left</i>
+        <span>{{dateFormatted()}}</span>
+        <i class="ph" (click)="dateNext()">caret-right</i>
+    </div>
+    <div class="flex-1/4 justify-self-end">
+        <ng-template></ng-template>
+    </div>
+</div>

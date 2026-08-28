@@ -1,0 +1,155 @@
+<!--
+MIT License
+Copyright (c) 2026 Grimfilerino 
+-->
+
+<div class="my-calendar relative w-full">
+	@if(calendarSettings()) {
+    <div #calendarInner class="calendar-inner overflow-scroll relative w-full h-full">
+		@if(times() && resources()){
+        <!-- Resource labels -->
+		<div #resourceList class="resources bg-white w-50 h-full z-99999 border-b border-t border-neutral-200 sticky left-0">
+            <!-- Top Resoruce Label -->
+            <div #resourceTitle class="bg-white">
+                <span class="font-bold text-lg">{{ resourceLabelText() }}</span>
+            </div>
+
+            <!-- Ungrouped resource labels -->
+            @for(resource of getResourcesWithNoGroup(); track resource.id; let i = $index) {
+				<div id="{{resource.id}}"
+					class="resource relative border-t border-neutral-200 before:content-[''] z-(--z-index) before:block before:w-(--before-width) 
+					before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
+					[ngStyle]="{ '--before-width': calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id) + 'px', '--z-index': (99 + i) }">
+					@if(!resourceTemplate() && resource.title) {
+						<div class="resource-label flex items-center pl-2 bg-white text-lg z-10 sticky">
+							<span>{{ resource.title }}</span>
+						</div>
+					} @else {
+						<ng-container *ngTemplateOutlet="resourceTemplate(); context:resource"></ng-container>
+					}
+				</div>
+            }
+
+            <!-- Grouped resources labels -->
+            @for(group of resourceGroups(); track group.id) {
+            <div class="resource-groups">
+                <div class="group-label relative font-bold bg-neutral-200 z-9999 border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
+				before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
+                    [ngStyle]="{ '--before-width': calendarInner.clientWidth  + 'px'}">
+                    <div class="content flex items-center">
+                        <i class="ph text-lg" (click)="group.expanded = !group.expanded" >{{group.expanded ? 'caret-down' : 'caret-up'}}</i>
+                        <span class="text-lg">{{ group.title }}</span>
+                    </div>
+                </div>
+
+                <!-- Resource labels in group -->
+                @if(group.expanded) {
+                    @for(resource of getResourcesInGroup(group.id); track resource.id; let i = $index) {
+                    <div id="{{resource.id}}"
+                        class="resource relative border-t border-neutral-200 before:content-[''] z-(--z-index) before:block before:w-(--before-width) 
+						before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
+                        [ngStyle]="{ '--before-width':calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id, 'GROUPED') + 'px', '--z-index': (99 + i) }">
+						@if(!resourceTemplate() && resource.title) {
+							<div class="resource-label flex items-center pl-2 bg-white text-lg z-10 sticky">
+								<span>{{ resource.title }}</span>
+							</div>
+						} @else {
+                            <ng-container *ngTemplateOutlet="resourceTemplate(); context:resource"></ng-container>
+						}
+                    </div>
+                    }
+                }
+            </div>
+            }
+		</div>
+
+        <!-- Events and timeslots -->
+        <div class="timeslot-event-container absolute top-0 left-50 w-full h-full">
+
+            <!-- Timeslots -->
+            <div #timeslots class="timeslots flex flex-row z-30 border-b border-t border-neutral-200 h-full bg-transparent last:border-r sticky top-0 w-full">
+				@for(time of times(); track time) {
+                <div id="timeslot-{{time}}" class="timeslot border-l border-neutral-200 shrink-0 w-20">
+                    <div class="timeslot-label flex items-center justify-center text-sm text-center relative">
+						@if(shouldTimeLabelBeVisible(time)) {
+							<span class="font-bold text-center">{{ time | formatTimeslot:(calendarSettings().locale ?? 'en') }}</span>
+						}
+                    </div>
+                </div>
+				}
+            </div>
+
+			<!-- Events -->
+            <div class="event-resource-rows absolute top-7.5 left-0 z-99 w-full">
+
+				<!-- Ungrouped reasources and their events -->
+                <div id="{{resource.id}}" class="event-resource-row relative" [ngStyle]="{ 'height' : getResourceHeigth(resource.id) + 'px' }" *ngFor="let resource of getResourcesWithNoGroup(); let i = index;">
+                    <div name="event-lane" class="event-lane absolute top-0 left-0 grid" 
+					[style]="getEventGridStyle(calendarInner.scrollWidth, resourceList.clientWidth, resource.id)">
+                        <div #eventUngrouped 
+							name="event" 
+							class="event absolute" 
+							*ngFor="let event of getCalendarEvents(resource.id)"
+                            [ngStyle]="event.style"
+							[attr.data-resource-id]="resource.id" 
+							[style.gridRow]="event.lane">
+							@if(!eventTemplate() && event.title) {
+								<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out hover:z-999999999999">
+									<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
+									<span class="pl-3.5 dark:text-white">{{event.title}}</span>
+								</div>
+							} @else {
+								<ng-container *ngTemplateOutlet="eventTemplate(); context:event"></ng-container>
+							}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grouped resources and their events -->
+                <div class="event-resource-groups w-full" *ngFor="let group of resourceGroups()">
+                    <div class="group-label h-7.5"></div>
+
+                    <!-- Events for resources in groups -->
+					@if(group.expanded) {
+                        <div id="{{resource.id}}" class="event-resource-row relative" 
+						[ngStyle]="{ 'height' : getResourceHeigth(resource.id, 'GROUPED') + 'px' }" 
+						*ngFor="let resource of getResourcesInGroup(group.id); let i = index;">
+                            <div name="event-lane" class="event-lane absolute top-0 left-0 grid"
+                                [style]="getEventGridStyle(calendarInner.scrollWidth, resourceList.clientWidth, resource.id, 'GROUPED')">
+                                <div #eventGrouped 
+									name="event" 
+									[attr.data-resource-id]="resource.id" 
+									class="event absolute" 
+									*ngFor="let event of getCalendarEvents(resource.id)" 
+									[ngStyle]="event.style" 
+									[style.gridRow]="event.lane">
+
+									@if(!eventTemplate() && event.title) {
+										<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out hover:z-999999999999">
+											<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
+											<span class="pl-3.5 dark:text-white">{{event.title}}</span>
+										</div>
+									} @else {
+										<ng-container *ngTemplateOutlet="eventTemplate(); context:event"></ng-container>
+									}
+                                </div>
+                            </div>
+                        </div>
+					}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Time indicator line -->
+        <div #timeline class="timeline absolute top-6 h-full z-9999 w-5 border-l border-red-500 content-[' '] transition-all duration-300"
+            [style.left.px]="timeLineOffset()"
+            [style.height.px]="timeLineHeight()"
+            [style.top.px]="resourceLabelHeight()">
+            <i class="ph time-indicator relative -top-3 text-red-500">caret-down</i>
+        </div>
+		}
+    </div>
+	}
+</div>
+
