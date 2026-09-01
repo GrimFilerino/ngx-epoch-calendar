@@ -34,30 +34,12 @@ export interface CalendarEvent {
     metadata?:      any,
 }
 
-export interface CalendarBusinessHourColors {
-    out:        string,
-    in:         string,
-}
-
-export interface CalendarDesignMode {
+export interface CalendarDesign {
     backgroundColor:    string,
     textColor:          string,
     gridColor:          string,
-    businessHourColor:  CalendarBusinessHourColors,
+    businessHourColor:  string,
     iconColor:          string,
-    iconSize:           number,
-    fontSize:           number,
-}
-
-export interface CalendarDesign {
-    dark:       CalendarDesignMode,
-    ligth:      CalendarDesignMode,
-    icons: {
-        groupIcon: {
-            expanded:   string,
-            collapsed:  string,
-        }
-    }
 }
 
 interface CalendarBusinessHourDay {
@@ -76,8 +58,6 @@ export interface CalendarSettings {
     timeslotInterval?:		number,
     timeslotLabelInterval?: number,
     businessHours?:			CalendarBusinessHours,
-    darkMode?:				boolean,
-    class?:					string,
     design?:				CalendarDesign,
 }
 

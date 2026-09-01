@@ -8,7 +8,7 @@ Copyright (c) 2026 Grimfilerino
     <div #calendarInner class="calendar-inner overflow-scroll relative w-full h-full" (scroll)="onCalendarScroll()">
 		@if(times() && resources()){
         <!-- Resource labels -->
-		<div #resourceList class="resources bg-white w-50 h-full z-999999 border-b border-t border-neutral-200 sticky left-0" [style.z-index]="resourceListAboveTimeline() ? 999999 : 9999">
+		<div #resourceList class="resources bg-white w-50 h-full border-b border-t border-neutral-200 sticky left-0" [style.z-index]="resourceListAboveTimeline() ? 40 : 20">
             <!-- Top Resoruce Label -->
             <div #resourceTitle class="bg-white text-center">
                 <span class="font-bold text-lg">{{ resourceLabelText() }}</span>
@@ -19,9 +19,9 @@ Copyright (c) 2026 Grimfilerino
 				<div id="{{resource.id}}"
 					class="resource relative border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
 					before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
-					[ngStyle]="{ '--before-width': calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id) + 'px', '--z-index': (99 + i) }">
+					[ngStyle]="{ '--before-width': calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id) + 'px' }">
 					@if(!resourceTemplate() && resource.title) {
-						<div class="resource-label flex items-center pl-2 bg-white text-lg z-10 sticky">
+						<div class="resource-label flex items-center pl-2 bg-white text-lg sticky">
 							<span>{{ resource.title }}</span>
 						</div>
 					} @else {
@@ -48,9 +48,9 @@ Copyright (c) 2026 Grimfilerino
                     <div id="{{resource.id}}"
                         class="resource relative border-t border-neutral-200 before:content-['']  before:block before:w-(--before-width) 
 						before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
-                        [ngStyle]="{ '--before-width':calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id, 'GROUPED') + 'px', '--z-index': (99 + i) }">
+                        [ngStyle]="{ '--before-width':calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id, 'GROUPED') + 'px' }">
 						@if(!resourceTemplate() && resource.title) {
-							<div class="resource-label flex items-center pl-2 bg-white text-lg z-10 sticky">
+							<div class="resource-label flex items-center pl-2 bg-white text-lg sticky">
 								<span>{{ resource.title }}</span>
 							</div>
 						} @else {
@@ -67,7 +67,7 @@ Copyright (c) 2026 Grimfilerino
         <div class="timeslot-event-container absolute top-0 left-50 w-full h-full">
 
             <!-- Timeslots -->
-            <div #timeslots class="timeslots flex flex-row z-30 border-b border-t border-neutral-200 h-full bg-transparent last:border-r sticky top-0 w-full">
+            <div #timeslots class="timeslots flex flex-row border-b border-t border-neutral-200 h-full bg-transparent last:border-r sticky top-0 w-full">
 				@for(time of times(); track time) {
                 <div id="timeslot-{{time}}" class="timeslot border-l border-neutral-200 shrink-0 w-20" 
 				[ngClass]="{'non-business-hour': (hasBusinessHoursToday() && !getTimeslotBusinessHour(time)) }">
@@ -81,7 +81,7 @@ Copyright (c) 2026 Grimfilerino
             </div>
 
 			<!-- Events -->
-            <div class="event-resource-rows absolute top-7.5 left-0 z-99 w-full">
+            <div class="event-resource-rows absolute top-7.5 left-0 w-full">
 
 				<!-- Ungrouped reasources and their events -->
                 <div id="{{resource.id}}" class="event-resource-row relative" [ngStyle]="{ 'height' : getResourceHeigth(resource.id) + 'px' }" *ngFor="let resource of getResourcesWithNoGroup(); let i = index;">
@@ -105,7 +105,7 @@ Copyright (c) 2026 Grimfilerino
 							[attr.data-resource-id]="resource.id" 
 							[style.gridRow]="event.lane">
 							@if(!eventTemplate() && event.title) {
-								<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out hover:z-999999999999">
+								<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out">
 									<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
 									<span class="pl-3.5 dark:text-white">{{event.title}}</span>
 									<span class="text-xs">{{event.subTitle}}</span>
@@ -147,7 +147,7 @@ Copyright (c) 2026 Grimfilerino
 									[style.gridRow]="event.lane">
 
 									@if(!eventTemplate() && event.title) {
-										<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out hover:z-999999999999">
+										<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out">
 											<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
 											<span class="pl-3.5 dark:text-white">{{event.title}}</span>
 											<span class="text-xs">{{event.subTitle}}</span>
@@ -165,7 +165,7 @@ Copyright (c) 2026 Grimfilerino
         </div>
 
         <!-- Time indicator line -->
-        <div #timeline class="timeline absolute top-6 h-full z-99999 w-5 border-l border-red-500 content-[' '] transition-all duration-300"
+        <div #timeline class="timeline absolute top-6 h-full z-30 w-5 border-l border-red-500 content-[' '] transition-all duration-300"
             [style.left.px]="timeLineOffset()"
             [style.height.px]="timeLineHeight()"
             [style.top.px]="resourceLabelHeight()">

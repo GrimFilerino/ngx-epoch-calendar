@@ -7,6 +7,17 @@ Copyright (c) 2026 Grimfilerino
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 
+:root {
+	--text-color: #000;
+	--grid-color: #a1a1a1;
+	--background-color: #fff;
+	--event-color: #B5C1CA;
+	--full-color:#9b111e;
+	--free-color:#228b22;
+	--business-color: #99999950;
+	--icon-color: #fff;
+}
+
 @custom-variant dark (&:where(.dark));
 
 .my-calendar {
@@ -17,14 +28,13 @@ i.ph.time-indicator{
     left: -8.5px;
 }
 
-.free {
-	background-color: #228b22;
-}
 
-.full {
-	background-color: #9b111e;
-}
-
-.non-business-hour {
-	background-color: #99999950;
+@theme{
+	--text:var(--text-color);
+	--free: var(--free-color);
+	--full: var(--full-color);
+	--non-business-hour: var(--business-color);
+	--background: var(--background-color);
+	--event: var(--event-color);
+	--icon: var(--icon-color);
 }
