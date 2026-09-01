@@ -11,7 +11,8 @@ export interface CalendarResource {
 		fullClass?: string,
 		freeClass?: string,
 		removeSlots?: boolean,
-	}
+	},
+	collapsed?: boolean,
 }
 
 export interface CalendarResourceGroup {
@@ -59,6 +60,7 @@ export interface CalendarSettings {
     timeslotLabelInterval?: number,
     businessHours?:			CalendarBusinessHours,
     design?:				CalendarDesign,
+	enableResourceCollapse?: boolean,
 }
 
 

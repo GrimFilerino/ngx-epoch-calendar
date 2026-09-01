@@ -3,7 +3,7 @@ MIT License
 Copyright (c) 2026 Grimfilerino 
 */
 
-import { Component, OnInit, TemplateRef, ElementRef, computed, signal, AfterViewInit, OnDestroy, effect, input, output, viewChild, viewChildren } from '@angular/core';
+import { Component, OnInit, TemplateRef, ElementRef, computed, signal, AfterViewInit, OnDestroy, effect, input, output, viewChild, viewChildren, inject, ChangeDetectorRef } from '@angular/core';
 import { CalendarEvent, CalendarEventClicked, CalendarResource, CalendarResourceGroup, CalendarSettings, CalendarDragEvent } from '../../interfaces/calendar';
 import { CommonModule } from '@angular/common';
 import { FormatTimeSlotPipe } from '../../pipes/format';
@@ -26,6 +26,9 @@ interface ExtendedCalendarEvent extends CalendarEvent {
 	styleUrls: ['./ngx-epochx-day-calendar.css']
 })
 export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
+	// === Injects === //
+	private cdr = inject(ChangeDetectorRef);
+
 	// === Observers === //
 	private resizeObserver!: ResizeObserver;
 
@@ -63,6 +66,7 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 
 	public readonly resourceListAboveTimeline = this._resourceListAboveTimeline.asReadonly();
 
+	public collapsedResources = signal<Set<string>>(new Set());
 
 	// === Inputs === //
 	date = input.required<Date>();
@@ -156,10 +160,10 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 					this._resourceLabelHeight.set(this.resourceTitle().nativeElement.clientHeight);
 					this._timeslotsHeight.set(this.timeslots().nativeElement.clientHeight);
 					this._timeLineOffset.set(this.currentTimeInPixels);
+					this.jumpToCurrentTime();
 				}
 			}
 
-			this.jumpToCurrentTime();
 		});
 
 		this.resizeObserver.observe(this.resourceTitle().nativeElement);
@@ -245,8 +249,6 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 				}
 			}
 
-			
-
 			if (!placed) {
 				lanes.push([event]);
 				event.lane = lanes.length;
@@ -283,6 +285,22 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	// === Public Functions === //
+
+	public toggleResource(resourceId: string) {
+		this.collapsedResources.update(set => {
+			const next = new Set(set);
+
+			if (next.has(resourceId)) {
+				next.delete(resourceId);
+			} else {
+				next.add(resourceId);
+			}
+
+			return next;
+		});
+
+		this.cdr.detectChanges();
+	}
 
 	public getTimeslotBusinessHour(time: TimeSlot): any {
 		return this.todaysBusinessHours[time];
@@ -415,11 +433,11 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 		return `${this.timeslots().nativeElement.clientWidth}px`;
 	}
 
-	public getResourceHeigth(resourceId: string, eventType: "GROUPED" | "UNGROUPED" = "UNGROUPED") {
+	public getResourceHeight(resourceId: string, eventType: "GROUPED" | "UNGROUPED" = "UNGROUPED") {
 		let height = 0;
 		let availabilityHeight = 0;
-		
 		let resource = this.resources().find(r => r.id == resourceId);
+		const collapsed = this.collapsedResources();
 
 		if(resource?.availability?.enabled) {
 			availabilityHeight = 18; //18px 
@@ -438,7 +456,11 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 		}
 
 		if(height == 0) {
-			height = 48;
+			if(!this.calendarSettings().enableResourceCollapse || !collapsed.has(resourceId)) {
+				height = 48;
+			} else {
+				height = 28;
+			}
 		}
 
 		return height + availabilityHeight;

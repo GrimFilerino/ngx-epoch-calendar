@@ -3,7 +3,7 @@ MIT License
 Copyright (c) 2026 Grimfilerino 
 -->
 
-<div class="my-calendar relative w-full">
+<div class="my-calendar relative w-full bg">
 	@if(calendarSettings()) {
     <div #calendarInner class="calendar-inner overflow-scroll relative w-full h-full" (scroll)="onCalendarScroll()">
 		@if(times() && resources()){
@@ -11,17 +11,22 @@ Copyright (c) 2026 Grimfilerino
 		<div #resourceList class="resources bg-white w-50 h-full border-b border-t border-neutral-200 sticky left-0" [style.z-index]="resourceListAboveTimeline() ? 40 : 20">
             <!-- Top Resoruce Label -->
             <div #resourceTitle class="bg-white text-center">
-                <span class="font-bold text-lg">{{ resourceLabelText() }}</span>
+                <span class="font-bold text-lg text">{{ resourceLabelText() }}</span>
             </div>
 
             <!-- Ungrouped resource labels -->
             @for(resource of getResourcesWithNoGroup(); track resource.id; let i = $index) {
 				<div id="{{resource.id}}"
 					class="resource relative border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
-					before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
-					[ngStyle]="{ '--before-width': calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id) + 'px' }">
+					before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200 z-20"
+					[ngStyle]="{ '--before-width': calendarInner.clientWidth + 'px', 'height': getResourceHeight(resource.id) + 'px' }">
 					@if(!resourceTemplate() && resource.title) {
 						<div class="resource-label flex items-center pl-2 bg-white text-lg sticky">
+							<i class="ph" [ngClass]="{
+								'ph-caret-up': collapsedResources().has(resource.id),
+								'ph-caret-down': !collapsedResources().has(resource.id)
+							}"
+						(click)="toggleResource(resource.id)"></i>
 							<span>{{ resource.title }}</span>
 						</div>
 					} @else {
@@ -34,7 +39,7 @@ Copyright (c) 2026 Grimfilerino
             @for(group of resourceGroups(); track group.id) {
             <div class="resource-groups">
                 <div class="group-label relative font-bold bg-neutral-200 border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
-				before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
+				before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200 z-20"
                     [ngStyle]="{ '--before-width': calendarInner.clientWidth  + 'px'}">
                     <div class="content flex items-center">
                         <i class="ph text-lg" (click)="group.expanded = !group.expanded" >{{group.expanded ? 'caret-down' : 'caret-up'}}</i>
@@ -48,10 +53,15 @@ Copyright (c) 2026 Grimfilerino
                     <div id="{{resource.id}}"
                         class="resource relative border-t border-neutral-200 before:content-['']  before:block before:w-(--before-width) 
 						before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
-                        [ngStyle]="{ '--before-width':calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id, 'GROUPED') + 'px' }">
+                        [ngStyle]="{ '--before-width':calendarInner.clientWidth + 'px', 'height': getResourceHeight(resource.id, 'GROUPED') + 'px' }">
 						@if(!resourceTemplate() && resource.title) {
 							<div class="resource-label flex items-center pl-2 bg-white text-lg sticky">
-								<span>{{ resource.title }}</span>
+								<i class="ph" [ngClass]="{
+									'ph-caret-up': collapsedResources().has(resource.id),
+									'ph-caret-down': !collapsedResources().has(resource.id)
+								}"
+								(click)="toggleResource(resource.id)"></i>
+								<span class="text">{{ resource.title }}</span>
 							</div>
 						} @else {
                             <ng-container *ngTemplateOutlet="resourceTemplate(); context:resource"></ng-container>
@@ -64,7 +74,7 @@ Copyright (c) 2026 Grimfilerino
 		</div>
 
         <!-- Events and timeslots -->
-        <div class="timeslot-event-container absolute top-0 left-50 w-full h-full">
+        <div class="timeslot-event-container absolute top-0 left-50 h-full">
 
             <!-- Timeslots -->
             <div #timeslots class="timeslots flex flex-row border-b border-t border-neutral-200 h-full bg-transparent last:border-r sticky top-0 w-full">
@@ -73,7 +83,7 @@ Copyright (c) 2026 Grimfilerino
 				[ngClass]="{'non-business-hour': (hasBusinessHoursToday() && !getTimeslotBusinessHour(time)) }">
                     <div class="timeslot-label flex items-center justify-center text-sm text-center relative">
 						@if(shouldTimeLabelBeVisible(time)) {
-							<span class="font-bold text-center">{{ time | formatTimeslot:(calendarSettings().locale ?? 'en') }}</span>
+							<span class="font-bold text-center text">{{ time | formatTimeslot:(calendarSettings().locale ?? 'en') }}</span>
 						}
                     </div>
                 </div>
@@ -84,82 +94,100 @@ Copyright (c) 2026 Grimfilerino
             <div class="event-resource-rows absolute top-7.5 left-0 w-full">
 
 				<!-- Ungrouped reasources and their events -->
-                <div id="{{resource.id}}" class="event-resource-row relative" [ngStyle]="{ 'height' : getResourceHeigth(resource.id) + 'px' }" *ngFor="let resource of getResourcesWithNoGroup(); let i = index;">
+				@for(resource of getResourcesWithNoGroup(); track resource.id) {
+                <div id="{{resource.id}}" class="event-resource-row relative" [ngStyle]="{ 'height' : getResourceHeight(resource.id) + 'px' }">
                     <div name="event-lane" class="event-lane absolute top-0 left-0 grid" 
 					[style]="getEventGridStyle(calendarInner.scrollWidth, resourceList.clientWidth)">
 						@if(resource?.availability?.enabled) {
 							@for(time of times(); track time) {
 								<div class="availability-{{time}} h-4.5 text-center text-xs"
 									[ngClass]="getResourceAvailabilityClass(time, resource.id)" [ngStyle]="getResourceAvailabilityStyle(time)">
-									<span>
+									<span class="text">
 										{{getAvailabilitySlots(time, resource.id)}}
 									</span>
 								</div>
 							}
 						}
+
+						@for(event of getCalendarEvents(resource.id); track event.id) {
                         <div #eventUngrouped 
 							name="event" 
 							class="event absolute" 
-							*ngFor="let event of getCalendarEvents(resource.id)"
                             [ngStyle]="event.style"
 							[attr.data-resource-id]="resource.id" 
 							[style.gridRow]="event.lane">
 							@if(!eventTemplate() && event.title) {
-								<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out">
-									<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
-									<span class="pl-3.5 dark:text-white">{{event.title}}</span>
-									<span class="text-xs">{{event.subTitle}}</span>
+								<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out" 
+								[ngClass]="{ 'min-h-7! h-7' : collapsedResources().has(resource.id) }">
+									@if(!collapsedResources().has(resource.id)) {
+										<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
+									}
+									<span class="pl-3.5 dark:text-white text">{{event.title}}</span>
+									<span class="text-xs text">{{event.subTitle}}</span>
 								</div>
 							} @else {
 								<ng-container *ngTemplateOutlet="eventTemplate(); context:event"></ng-container>
 							}
                         </div>
+						}
                     </div>
                 </div>
+				}
 
                 <!-- Grouped resources and their events -->
-                <div class="event-resource-groups w-full" *ngFor="let group of resourceGroups()">
+				@for(group of resourceGroups(); track group.id) {
+                <div class="event-resource-groups w-full">
                     <div class="group-label h-7.5"></div>
 
                     <!-- Events for resources in groups -->
 					@if(group.expanded) {
+						@for(resource of getResourcesInGroup(group.id); track resource.id){
                         <div id="{{resource.id}}" class="event-resource-row relative" 
-						[ngStyle]="{ 'height' : getResourceHeigth(resource.id, 'GROUPED') + 'px' }" 
-						*ngFor="let resource of getResourcesInGroup(group.id); let i = index;">
+						[ngStyle]="{ 'height' : getResourceHeight(resource.id, 'GROUPED') + 'px' }" >
+
+							@if(!calendarSettings().enableResourceCollapse || !resource.collapsed) {
                             <div name="event-lane" class="event-lane absolute top-0 left-0 grid"
                                 [style]="getEventGridStyle(calendarInner.scrollWidth, resourceList.clientWidth)">
 								@if(resource?.availability?.enabled) {
 									@for(time of times(); track time) {
 										<div class="availability-{{time}} h-4.5 text-center text-xs {{getResourceAvailabilityClass(time, resource.id)}}"
 											[ngStyle]="getResourceAvailabilityStyle(time)">
-											<span>
+											<span class="text">
 												{{getAvailabilitySlots(time, resource.id)}}
 											</span>
 										</div>
 									}
 								}
+
+								@for(event of getCalendarEvents(resource.id); track event.id) {
                                 <div #eventGrouped 
 									name="event" 
 									[attr.data-resource-id]="resource.id" 
 									class="event absolute" 
-									*ngFor="let event of getCalendarEvents(resource.id)" 
 									[ngStyle]="event.style" 
 									[style.gridRow]="event.lane">
 
 									@if(!eventTemplate() && event.title) {
-										<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out">
-											<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
-											<span class="pl-3.5 dark:text-white">{{event.title}}</span>
-											<span class="text-xs">{{event.subTitle}}</span>
+										<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out" 
+										[ngClass]="{ 'min-h-7! h-7' : collapsedResources().has(resource.id) }">
+											@if(!collapsedResources().has(resource.id)) {
+												<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
+											}
+											<span class="pl-3.5 text dark:text-white">{{event.title}}</span>
+											<span class="text-xs text">{{event.subTitle}}</span>
 										</div>
 									} @else {
 										<ng-container *ngTemplateOutlet="eventTemplate(); context:event"></ng-container>
 									}
                                 </div>
+								}
                             </div>
+							}
                         </div>
+						}
 					}
                 </div>
+				}
             </div>
 
         </div>
@@ -169,7 +197,7 @@ Copyright (c) 2026 Grimfilerino
             [style.left.px]="timeLineOffset()"
             [style.height.px]="timeLineHeight()"
             [style.top.px]="resourceLabelHeight()">
-            <i class="ph time-indicator relative -top-3 text-red-500">caret-down</i>
+            <i class="ph time-indicator relative -top-3 text-red-500!">caret-down</i>
         </div>
 		}
     </div>
