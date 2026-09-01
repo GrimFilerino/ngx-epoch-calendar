@@ -5,6 +5,13 @@ export interface CalendarResource {
     title:          string,
     groupId?:       string,
     metadata?:      any,
+	availability?:	{
+		enabled: boolean,
+		maxSlots: number,
+		fullClass?: string,
+		freeClass?: string,
+		removeSlots?: boolean,
+	}
 }
 
 export interface CalendarResourceGroup {
@@ -20,6 +27,7 @@ export interface CalendarEvent {
     resourceId:     string,
     startDate:      Date,
     endDate:        Date,
+	slots:			number,
     subTitle?:      string,
     class?:         string,
     color?:         string,
@@ -58,7 +66,7 @@ interface CalendarBusinessHourDay {
 }
 
 export interface CalendarBusinessHours {
-    [key:string]:       CalendarBusinessHourDay,
+    [day:string]:       CalendarBusinessHourDay,
 }
 
 export interface CalendarSettings {

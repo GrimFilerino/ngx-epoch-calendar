@@ -5,19 +5,19 @@ Copyright (c) 2026 Grimfilerino
 
 <div class="my-calendar relative w-full">
 	@if(calendarSettings()) {
-    <div #calendarInner class="calendar-inner overflow-scroll relative w-full h-full">
+    <div #calendarInner class="calendar-inner overflow-scroll relative w-full h-full" (scroll)="onCalendarScroll()">
 		@if(times() && resources()){
         <!-- Resource labels -->
-		<div #resourceList class="resources bg-white w-50 h-full z-99999 border-b border-t border-neutral-200 sticky left-0">
+		<div #resourceList class="resources bg-white w-50 h-full z-999999 border-b border-t border-neutral-200 sticky left-0" [style.z-index]="resourceListAboveTimeline() ? 999999 : 9999">
             <!-- Top Resoruce Label -->
-            <div #resourceTitle class="bg-white">
+            <div #resourceTitle class="bg-white text-center">
                 <span class="font-bold text-lg">{{ resourceLabelText() }}</span>
             </div>
 
             <!-- Ungrouped resource labels -->
             @for(resource of getResourcesWithNoGroup(); track resource.id; let i = $index) {
 				<div id="{{resource.id}}"
-					class="resource relative border-t border-neutral-200 before:content-[''] z-(--z-index) before:block before:w-(--before-width) 
+					class="resource relative border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
 					before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
 					[ngStyle]="{ '--before-width': calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id) + 'px', '--z-index': (99 + i) }">
 					@if(!resourceTemplate() && resource.title) {
@@ -33,7 +33,7 @@ Copyright (c) 2026 Grimfilerino
             <!-- Grouped resources labels -->
             @for(group of resourceGroups(); track group.id) {
             <div class="resource-groups">
-                <div class="group-label relative font-bold bg-neutral-200 z-9999 border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
+                <div class="group-label relative font-bold bg-neutral-200 border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
 				before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
                     [ngStyle]="{ '--before-width': calendarInner.clientWidth  + 'px'}">
                     <div class="content flex items-center">
@@ -46,7 +46,7 @@ Copyright (c) 2026 Grimfilerino
                 @if(group.expanded) {
                     @for(resource of getResourcesInGroup(group.id); track resource.id; let i = $index) {
                     <div id="{{resource.id}}"
-                        class="resource relative border-t border-neutral-200 before:content-[''] z-(--z-index) before:block before:w-(--before-width) 
+                        class="resource relative border-t border-neutral-200 before:content-['']  before:block before:w-(--before-width) 
 						before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
                         [ngStyle]="{ '--before-width':calendarInner.clientWidth + 'px', 'height': getResourceHeigth(resource.id, 'GROUPED') + 'px', '--z-index': (99 + i) }">
 						@if(!resourceTemplate() && resource.title) {
@@ -69,7 +69,8 @@ Copyright (c) 2026 Grimfilerino
             <!-- Timeslots -->
             <div #timeslots class="timeslots flex flex-row z-30 border-b border-t border-neutral-200 h-full bg-transparent last:border-r sticky top-0 w-full">
 				@for(time of times(); track time) {
-                <div id="timeslot-{{time}}" class="timeslot border-l border-neutral-200 shrink-0 w-20">
+                <div id="timeslot-{{time}}" class="timeslot border-l border-neutral-200 shrink-0 w-20" 
+				[ngClass]="{'non-business-hour': (hasBusinessHoursToday() && !getTimeslotBusinessHour(time)) }">
                     <div class="timeslot-label flex items-center justify-center text-sm text-center relative">
 						@if(shouldTimeLabelBeVisible(time)) {
 							<span class="font-bold text-center">{{ time | formatTimeslot:(calendarSettings().locale ?? 'en') }}</span>
@@ -85,7 +86,17 @@ Copyright (c) 2026 Grimfilerino
 				<!-- Ungrouped reasources and their events -->
                 <div id="{{resource.id}}" class="event-resource-row relative" [ngStyle]="{ 'height' : getResourceHeigth(resource.id) + 'px' }" *ngFor="let resource of getResourcesWithNoGroup(); let i = index;">
                     <div name="event-lane" class="event-lane absolute top-0 left-0 grid" 
-					[style]="getEventGridStyle(calendarInner.scrollWidth, resourceList.clientWidth, resource.id)">
+					[style]="getEventGridStyle(calendarInner.scrollWidth, resourceList.clientWidth)">
+						@if(resource?.availability?.enabled) {
+							@for(time of times(); track time) {
+								<div class="availability-{{time}} h-4.5 text-center text-xs"
+									[ngClass]="getResourceAvailabilityClass(time, resource.id)" [ngStyle]="getResourceAvailabilityStyle(time)">
+									<span>
+										{{getAvailabilitySlots(time, resource.id)}}
+									</span>
+								</div>
+							}
+						}
                         <div #eventUngrouped 
 							name="event" 
 							class="event absolute" 
@@ -97,6 +108,7 @@ Copyright (c) 2026 Grimfilerino
 								<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out hover:z-999999999999">
 									<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
 									<span class="pl-3.5 dark:text-white">{{event.title}}</span>
+									<span class="text-xs">{{event.subTitle}}</span>
 								</div>
 							} @else {
 								<ng-container *ngTemplateOutlet="eventTemplate(); context:event"></ng-container>
@@ -115,7 +127,17 @@ Copyright (c) 2026 Grimfilerino
 						[ngStyle]="{ 'height' : getResourceHeigth(resource.id, 'GROUPED') + 'px' }" 
 						*ngFor="let resource of getResourcesInGroup(group.id); let i = index;">
                             <div name="event-lane" class="event-lane absolute top-0 left-0 grid"
-                                [style]="getEventGridStyle(calendarInner.scrollWidth, resourceList.clientWidth, resource.id, 'GROUPED')">
+                                [style]="getEventGridStyle(calendarInner.scrollWidth, resourceList.clientWidth)">
+								@if(resource?.availability?.enabled) {
+									@for(time of times(); track time) {
+										<div class="availability-{{time}} h-4.5 text-center text-xs {{getResourceAvailabilityClass(time, resource.id)}}"
+											[ngStyle]="getResourceAvailabilityStyle(time)">
+											<span>
+												{{getAvailabilitySlots(time, resource.id)}}
+											</span>
+										</div>
+									}
+								}
                                 <div #eventGrouped 
 									name="event" 
 									[attr.data-resource-id]="resource.id" 
@@ -128,6 +150,7 @@ Copyright (c) 2026 Grimfilerino
 										<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out hover:z-999999999999">
 											<div class="h-9 w-1 border-amber-500 rounded-sm bg-amber-500 content-[' '] absolute" [style.borderColor]="event.color" [style.backgroundColor]="event.color"></div>
 											<span class="pl-3.5 dark:text-white">{{event.title}}</span>
+											<span class="text-xs">{{event.subTitle}}</span>
 										</div>
 									} @else {
 										<ng-container *ngTemplateOutlet="eventTemplate(); context:event"></ng-container>
@@ -142,7 +165,7 @@ Copyright (c) 2026 Grimfilerino
         </div>
 
         <!-- Time indicator line -->
-        <div #timeline class="timeline absolute top-6 h-full z-9999 w-5 border-l border-red-500 content-[' '] transition-all duration-300"
+        <div #timeline class="timeline absolute top-6 h-full z-99999 w-5 border-l border-red-500 content-[' '] transition-all duration-300"
             [style.left.px]="timeLineOffset()"
             [style.height.px]="timeLineHeight()"
             [style.top.px]="resourceLabelHeight()">

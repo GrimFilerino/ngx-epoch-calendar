@@ -17,4 +17,14 @@ i.ph.time-indicator{
     left: -8.5px;
 }
 
+.free {
+	background-color: #228b22;
+}
 
+.full {
+	background-color: #9b111e;
+}
+
+.non-business-hour {
+	background-color: #99999950;
+}
