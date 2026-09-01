@@ -555,4 +555,8 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 		this.calendarInner().nativeElement.scrollTo({ left: this.timeLineOffset() + offset });
 		this.updateResourceListZIndex();
 	}
+
+	public getResourceCollapsedStatus(resourceId: string): boolean {
+		return this.co
+	}
 }
