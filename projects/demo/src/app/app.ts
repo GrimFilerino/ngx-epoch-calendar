@@ -1,5 +1,5 @@
-import { CalendarSettings, NgxEpochxDateHeader, NgxEpochxDayCalendar } from 'ngx-epochx-calendar';
-import { AfterViewInit, Component, signal, ViewChild } from '@angular/core';
+import { CalendarEvent, CalendarResource, CalendarSettings, NgxEpochxDateHeader, NgxEpochxDayCalendar } from 'ngx-epochx-calendar';
+import { Component, signal, ViewChild } from '@angular/core';
 
 @Component({
 	selector: 'app-root',
@@ -16,11 +16,11 @@ export class App {
 			title: "Group #1"
 		}
 	]);
-	resources = signal([
+
+	resources = signal<CalendarResource[]>([
 		{
 			id: "1",
 			title: "#1",
-			groupId: "23"
 		},
 		{
 			id: "2",
@@ -29,38 +29,33 @@ export class App {
 		{
 			id: "3",
 			title: "#3",
-			groupId: "23"
+			groupId: "23",
+			availability: {
+				enabled: true,
+				maxSlots: 1000,
+				removeSlots: true
+			}
 		}
 	]);
-	events = signal([
+
+	events = signal<CalendarEvent[]>([
 		{
-			title: "Testberg",
+			title: "Testberg 1",
 			id: "001",
 			resourceId: "1",
-			startDate: new Date(`2026-02-19T13:00`),
-			endDate: new Date(`2026-02-19T15:05`),
+			startDate: new Date(`2026-09-01T13:00`),
+			endDate: new Date(`2026-09-01T15:05`),
+			slots:0,
 		},
 		{
-			title: "Testberg",
+			title: "Testberg 2",
 			id: "011",
-			resourceId: "1",
-			startDate: new Date(`2026-02-19T12:00`),
-			endDate: new Date(`2026-02-19T16:00`),
-		},
-		{
-			title: "Testberg",
-			id: "111",
-			resourceId: "1",
-			startDate: new Date(`2026-02-19T19:00`),
-			endDate: new Date(`2026-02-19T22:00`),
-		},
-		{
-			title: "Testberg",
-			id: "121",
 			resourceId: "3",
-			startDate: new Date(`2026-02-19T16:00`),
-			endDate: new Date(`2026-02-19T19:00`),
-		}
+			startDate: new Date(`2026-09-01T12:00`),
+			endDate: new Date(`2026-09-01T16:00`),
+			slots:0,
+		},
+
 	]);
 
 	date = signal(new Date());
@@ -68,6 +63,12 @@ export class App {
 	myCalendarSettings: CalendarSettings = {
 		timezone: "Europe/Stockholm",
 		locale: "en-US",
+		businessHours: {
+			"tue": {
+				startTime: "08:00",
+				endTime: "17:00",
+			}
+		}
 	}
 
 	@ViewChild("calendar", { static: false }) calendar!: NgxEpochxDayCalendar;
