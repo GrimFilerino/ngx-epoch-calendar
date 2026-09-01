@@ -34,7 +34,7 @@ export class App {
 				enabled: true,
 				maxSlots: 1000,
 				removeSlots: true
-			}
+			},
 		}
 	]);
 
@@ -68,7 +68,8 @@ export class App {
 				startTime: "08:00",
 				endTime: "17:00",
 			}
-		}
+		},
+		enableResourceCollapse: true
 	}
 
 	@ViewChild("calendar", { static: false }) calendar!: NgxEpochxDayCalendar;
