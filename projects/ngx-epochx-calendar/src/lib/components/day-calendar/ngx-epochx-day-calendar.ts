@@ -557,6 +557,6 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 	}
 
 	public getResourceCollapsedStatus(resourceId: string): boolean {
-		return this.co
+		return this.collapsedResources().has(resourceId);
 	}
 }
