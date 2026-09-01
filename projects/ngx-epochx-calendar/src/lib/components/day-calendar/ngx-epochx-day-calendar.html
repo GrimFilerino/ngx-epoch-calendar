@@ -145,7 +145,6 @@ Copyright (c) 2026 Grimfilerino
                         <div id="{{resource.id}}" class="event-resource-row relative" 
 						[ngStyle]="{ 'height' : getResourceHeight(resource.id, 'GROUPED') + 'px' }" >
 
-							@if(!calendarSettings().enableResourceCollapse || !resource.collapsed) {
                             <div name="event-lane" class="event-lane absolute top-0 left-0 grid"
                                 [style]="getEventGridStyle(calendarInner.scrollWidth, resourceList.clientWidth)">
 								@if(resource?.availability?.enabled) {
@@ -182,7 +181,6 @@ Copyright (c) 2026 Grimfilerino
                                 </div>
 								}
                             </div>
-							}
                         </div>
 						}
 					}
