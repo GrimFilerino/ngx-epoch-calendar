@@ -12,7 +12,6 @@ export interface CalendarResource {
 		freeClass?: string,
 		removeSlots?: boolean,
 	},
-	collapsed?: boolean,
 }
 
 export interface CalendarResourceGroup {
