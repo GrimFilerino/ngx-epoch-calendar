@@ -5,7 +5,7 @@ Copyright (c) 2026 Grimfilerino
 
 <div class="my-calendar relative w-full bg">
 	@if(calendarSettings()) {
-    <div #calendarInner class="calendar-inner overflow-scroll relative w-full h-full" (scroll)="onCalendarScroll()">
+    <div #calendarInner class="calendar-inner overflow-auto relative w-full h-full" (scroll)="onCalendarScroll()">
 		@if(times() && resources()){
         <!-- Resource labels -->
 		<div #resourceList class="resources bg-white w-50 h-full border-b border-t border-neutral-200 sticky left-0" [style.z-index]="resourceListAboveTimeline() ? 40 : 20">
@@ -19,7 +19,7 @@ Copyright (c) 2026 Grimfilerino
 				<div id="{{resource.id}}"
 					class="resource relative border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
 					before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200 z-20"
-					[ngStyle]="{ '--before-width': calendarInner.clientWidth + 'px', 'height': getResourceHeight(resource.id) + 'px' }">
+					[ngStyle]="{ '--before-width': timeslots.clientWidth + 'px', 'height': getResourceHeight(resource.id) + 'px' }">
 					@if(!resourceTemplate() && resource.title) {
 						<div class="resource-label flex items-center pl-2 bg-white text-lg sticky">
 							<i class="ph" [ngClass]="{
@@ -40,7 +40,7 @@ Copyright (c) 2026 Grimfilerino
             <div class="resource-groups">
                 <div class="group-label relative font-bold bg-neutral-200 border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
 				before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200 z-20"
-                    [ngStyle]="{ '--before-width': calendarInner.clientWidth  + 'px'}">
+                    [ngStyle]="{ '--before-width': timeslots.clientWidth  + 'px'}">
                     <div class="content flex items-center">
                         <i class="ph text-lg" (click)="group.expanded = !group.expanded" >{{group.expanded ? 'caret-down' : 'caret-up'}}</i>
                         <span class="text-lg">{{ group.title }}</span>
@@ -53,7 +53,7 @@ Copyright (c) 2026 Grimfilerino
                     <div id="{{resource.id}}"
                         class="resource relative border-t border-neutral-200 before:content-['']  before:block before:w-(--before-width) 
 						before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
-                        [ngStyle]="{ '--before-width':calendarInner.clientWidth + 'px', 'height': getResourceHeight(resource.id, 'GROUPED') + 'px' }">
+                        [ngStyle]="{ '--before-width':timeslots.clientWidth + 'px', 'height': getResourceHeight(resource.id, 'GROUPED') + 'px' }">
 						@if(!resourceTemplate() && resource.title) {
 							<div class="resource-label flex items-center pl-2 bg-white text-lg sticky">
 								<i class="ph" [ngClass]="{
