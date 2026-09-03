@@ -111,10 +111,12 @@ Copyright (c) 2026 Grimfilerino
 
 						@for(event of getCalendarEvents(resource.id); track event.id) {
                         <div #eventUngrouped 
-							name="event" 
+							name="event"
+							[id]="event.id"
 							class="event absolute" 
                             [ngStyle]="event.style"
 							[attr.data-resource-id]="resource.id" 
+							[attr.data-lane]="event.lane" 
 							[style.gridRow]="event.lane">
 							@if(!eventTemplate() && event.title) {
 								<div class="bg-slate-400 min-h-12 p-1 rounded-sm relative flex items-center shadow-black hover:scale-105 hover:ease-in-out" 
@@ -161,7 +163,9 @@ Copyright (c) 2026 Grimfilerino
 								@for(event of getCalendarEvents(resource.id); track event.id) {
                                 <div #eventGrouped 
 									name="event" 
+									[id]="event.id"
 									[attr.data-resource-id]="resource.id" 
+									[attr.data-lane]="event.lane" 
 									class="event absolute" 
 									[ngStyle]="event.style" 
 									[style.gridRow]="event.lane">

@@ -5,7 +5,6 @@ import { Component, signal, ViewChild, ChangeDetectionStrategy } from '@angular/
 	selector: 'app-root',
 	imports: [NgxEpochxDayCalendar, NgxEpochxDateHeader],
 	templateUrl: './app.html',
-	changeDetection: ChangeDetectionStrategy.Eager,
 	styleUrl: './app.css'
 })
 export class App {

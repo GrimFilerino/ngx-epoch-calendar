@@ -3,7 +3,7 @@ MIT License
 Copyright (c) 2026 Grimfilerino 
 */
 
-import { Component, OnInit, TemplateRef, ElementRef, computed, signal, AfterViewInit, OnDestroy, effect, input, output, viewChild, viewChildren, inject, ChangeDetectorRef, untracked, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, TemplateRef, ElementRef, computed, signal, AfterViewInit, OnDestroy, effect, input, output, viewChild, viewChildren, inject, ChangeDetectorRef } from '@angular/core';
 import { CalendarEvent, CalendarEventClicked, CalendarResource, CalendarResourceGroup, CalendarSettings, CalendarDragEvent } from '../../interfaces/calendar';
 import { CommonModule } from '@angular/common';
 import { FormatTimeSlotPipe } from '../../pipes/format';
@@ -23,7 +23,6 @@ interface ExtendedCalendarEvent extends CalendarEvent {
 	imports: [CommonModule, FormatTimeSlotPipe],
 	standalone: true,
 	templateUrl: './ngx-epochx-day-calendar.html',
-	changeDetection: ChangeDetectionStrategy.Eager,
 	styleUrls: ['./ngx-epochx-day-calendar.css']
 })
 export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
@@ -289,7 +288,7 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 
 	// === Public Functions === //
 
-	public toggleResource(resourceId: string) {
+	public toggleResource(resourceId: string, skipChangeDetection: boolean = false) {
 		this.collapsedResources.update(set => {
 			const next = new Set(set);
 
@@ -302,7 +301,9 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 			return next;
 		});
 
-		this.cdr.detectChanges();
+		if(skipChangeDetection) {
+			this.cdr.detectChanges();
+		}
 	}
 
 	public getTimeslotBusinessHour(time: TimeSlot): any {
@@ -441,7 +442,7 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 		let availabilityHeight = 0;
 		let resource = this.resources().find(r => r.id == resourceId);
 		const collapsed = this.collapsedResources();
-		
+
 		const eventTemplate = this.eventTemplate();
 
 		if (resource?.availability?.enabled) {
@@ -450,37 +451,37 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 
 		const events = eventType === "GROUPED" ? this.eventsGrouped() : this.eventsUngrouped();
 
-		let laneHeight: { [lane: string]: number} = {};
+		let laneHeight: { [lane: string]: number } = {};
 		for (const event of events) {
 			const element = event.nativeElement;
 
 			if (element.getAttribute('data-resource-id') !== resourceId) {
 				continue;
 			}
-		
+
 			let lane = element.getAttribute('data-lane');
 
-			if(!lane) {
+			if (!lane) {
 				continue;
 			}
 
-			if(!laneHeight[lane]) {
+			if (!laneHeight[lane]) {
 				laneHeight[lane] = element.clientHeight;
 				continue;
 			}
 
-			if(laneHeight[lane] < element.clientHeight) {
+			if (laneHeight[lane] < element.clientHeight) {
 				laneHeight[lane] = element.clientHeight;
 			}
 		}
 
-		for(let [_, value] of Object.entries(laneHeight)) {
+		for (let [_, value] of Object.entries(laneHeight)) {
 			height += value;
 		}
 
 		if (height == 0) {
 			if (!this.calendarSettings().enableResourceCollapse || !collapsed.has(resourceId)) {
-					height = eventTemplate ? 28 : 48;
+				height = eventTemplate ? 28 : 48;
 			} else {
 				height = 28;
 			}
