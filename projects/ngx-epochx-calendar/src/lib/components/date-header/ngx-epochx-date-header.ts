@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, signal} from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter, AfterViewInit, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DateTime } from 'luxon';
 
@@ -7,6 +7,7 @@ import { DateTime } from 'luxon';
     imports: [CommonModule],
     standalone: true,
     templateUrl: './ngx-epochx-date-header.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./ngx-epochx-date-header.css']
 })
 export class NgxEpochxDateHeader implements OnInit, AfterViewInit {

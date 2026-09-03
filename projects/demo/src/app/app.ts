@@ -1,10 +1,11 @@
 import { CalendarEvent, CalendarResource, CalendarSettings, NgxEpochxDateHeader, NgxEpochxDayCalendar } from 'ngx-epochx-calendar';
-import { Component, signal, ViewChild } from '@angular/core';
+import { Component, signal, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
 	selector: 'app-root',
 	imports: [NgxEpochxDayCalendar, NgxEpochxDateHeader],
 	templateUrl: './app.html',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	styleUrl: './app.css'
 })
 export class App {

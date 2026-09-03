@@ -3,7 +3,7 @@ MIT License
 Copyright (c) 2026 Grimfilerino 
 */
 
-import { Component, OnInit, TemplateRef, ElementRef, computed, signal, AfterViewInit, OnDestroy, effect, input, output, viewChild, viewChildren, inject, ChangeDetectorRef, untracked } from '@angular/core';
+import { Component, OnInit, TemplateRef, ElementRef, computed, signal, AfterViewInit, OnDestroy, effect, input, output, viewChild, viewChildren, inject, ChangeDetectorRef, untracked, ChangeDetectionStrategy } from '@angular/core';
 import { CalendarEvent, CalendarEventClicked, CalendarResource, CalendarResourceGroup, CalendarSettings, CalendarDragEvent } from '../../interfaces/calendar';
 import { CommonModule } from '@angular/common';
 import { FormatTimeSlotPipe } from '../../pipes/format';
@@ -23,6 +23,7 @@ interface ExtendedCalendarEvent extends CalendarEvent {
 	imports: [CommonModule, FormatTimeSlotPipe],
 	standalone: true,
 	templateUrl: './ngx-epochx-day-calendar.html',
+	changeDetection: ChangeDetectionStrategy.Eager,
 	styleUrls: ['./ngx-epochx-day-calendar.css']
 })
 export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
