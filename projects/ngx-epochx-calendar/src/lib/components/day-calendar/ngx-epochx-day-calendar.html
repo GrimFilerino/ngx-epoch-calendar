@@ -3,9 +3,9 @@ MIT License
 Copyright (c) 2026 Grimfilerino 
 -->
 
-<div class="my-calendar relative w-full bg">
+<div class="my-calendar relative w-full h-full bg">
 	@if(calendarSettings()) {
-    <div #calendarInner class="calendar-inner overflow-auto relative w-full h-full" (scroll)="onCalendarScroll()">
+    <div #calendarInner class="calendar-inner overflow-scroll relative w-full h-full" (scroll)="onCalendarScroll()">
 		@if(times() && resources()){
         <!-- Resource labels -->
 		<div #resourceList class="resources bg-white w-50 h-full border-b border-t border-neutral-200 sticky left-0" [style.z-index]="resourceListAboveTimeline() ? 40 : 20">
@@ -17,11 +17,11 @@ Copyright (c) 2026 Grimfilerino
             <!-- Ungrouped resource labels -->
             @for(resource of getResourcesWithNoGroup(); track resource.id; let i = $index) {
 				<div id="{{resource.id}}"
-					class="resource relative border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
+					class="resource relative bg-white border-t border-neutral-200 before:content-[''] before:block before:w-(--before-width) 
 					before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200 z-20"
-					[ngStyle]="{ '--before-width': timeslots.clientWidth + 'px', 'height': getResourceHeight(resource.id) + 'px' }">
+					[ngStyle]="{ '--before-width': timeslots.clientWidth + 'px', 'height': getResourceHeight(resource.id) + 'px', 'z-index': (20 + i) }">
 					@if(!resourceTemplate() && resource.title) {
-						<div class="resource-label flex items-center pl-2 bg-white text-lg sticky">
+						<div class="resource-label flex items-center pl-2 bg-white text-lg sticky h-full">
 							<i class="ph" [ngClass]="{
 								'ph-caret-up': collapsedResources().has(resource.id),
 								'ph-caret-down': !collapsedResources().has(resource.id)
@@ -51,11 +51,11 @@ Copyright (c) 2026 Grimfilerino
                 @if(group.expanded) {
                     @for(resource of getResourcesInGroup(group.id); track resource.id; let i = $index) {
                     <div id="{{resource.id}}"
-                        class="resource relative border-t border-neutral-200 before:content-['']  before:block before:w-(--before-width) 
+                        class="resource relative bg-white border-t border-neutral-200 before:content-['']  before:block before:w-(--before-width) 
 						before:-translate-y-px before:relative before:left-full before:border-t before:border-neutral-200"
-                        [ngStyle]="{ '--before-width':timeslots.clientWidth + 'px', 'height': getResourceHeight(resource.id, 'GROUPED') + 'px' }">
+                        [ngStyle]="{ '--before-width':timeslots.clientWidth + 'px', 'height': getResourceHeight(resource.id, 'GROUPED') + 'px', 'z-index': (20 + i) }">
 						@if(!resourceTemplate() && resource.title) {
-							<div class="resource-label flex items-center pl-2 bg-white text-lg sticky">
+							<div class="resource-label flex items-center pl-2 bg-white text-lg sticky h-full">
 								<i class="ph" [ngClass]="{
 									'ph-caret-up': collapsedResources().has(resource.id),
 									'ph-caret-down': !collapsedResources().has(resource.id)
@@ -74,14 +74,14 @@ Copyright (c) 2026 Grimfilerino
 		</div>
 
         <!-- Events and timeslots -->
-        <div class="timeslot-event-container absolute top-0 left-50 h-full">
+        <div class="timeslot-event-container absolute top-0 left-50" [style.height.px]="resourceList.scrollHeight">
 
             <!-- Timeslots -->
-            <div #timeslots class="timeslots flex flex-row border-b border-t border-neutral-200 h-full bg-transparent last:border-r sticky top-0 w-full">
+            <div #timeslots class="timeslots flex flex-row border-b border-t border-neutral-200 h-full bg-transparent last:border-r w-full">
 				@for(time of times(); track time) {
                 <div id="timeslot-{{time}}" class="timeslot border-l border-neutral-200 shrink-0 w-20" 
 				[ngClass]="{'non-business-hour': (hasBusinessHoursToday() && !getTimeslotBusinessHour(time)) }">
-                    <div class="timeslot-label flex items-center justify-center text-sm text-center relative">
+                    <div class="timeslot-label flex items-center justify-center text-sm text-center sticky top-0 bg z-15">
 						@if(shouldTimeLabelBeVisible(time)) {
 							<span class="font-bold text-center text">{{ time | formatTimeslot:(calendarSettings().locale ?? 'en') }}</span>
 						}
