@@ -94,7 +94,6 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 	resourceTitle = viewChild.required<ElementRef<HTMLDivElement>>('resourceTitle');
 	calendarInner = viewChild.required<ElementRef<HTMLDivElement>>('calendarInner');
 	resourceList = viewChild.required<ElementRef<HTMLDivElement>>('resourceList');
-	calendar = viewChild.required<ElementRef<HTMLDivElement>>('calendar');
 
 	eventsUngrouped = viewChildren<ElementRef<HTMLDivElement>>('eventUngrouped');
 	eventsGrouped = viewChildren<ElementRef<HTMLDivElement>>('eventGrouped');
@@ -152,9 +151,6 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 					this._resourceLabelHeight.set(this.resourceTitle().nativeElement.clientHeight);
 				}
 
-				if (entry.target.isSameNode(this.resourceList().nativeElement)) {
-				}
-
 				if (entry.target.isSameNode(this.timeslots().nativeElement)) {
 					this._timeslotsHeight.set(this.timeslots().nativeElement.clientHeight);
 					this._timeLineOffset.set(this.currentTimeInPixels);
@@ -171,7 +167,6 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 		});
 
 		this.resizeObserver.observe(this.resourceTitle().nativeElement);
-		this.resizeObserver.observe(this.resourceList().nativeElement);
 		this.resizeObserver.observe(this.timeslots().nativeElement);
 		this.resizeObserver.observe(this.calendarInner().nativeElement);
 
@@ -445,6 +440,8 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 		let availabilityHeight = 0;
 		let resource = this.resources().find(r => r.id == resourceId);
 		const collapsed = this.collapsedResources();
+		
+		const eventTemplate = this.eventTemplate();
 
 		if (resource?.availability?.enabled) {
 			availabilityHeight = 18; //18px 
@@ -452,19 +449,37 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 
 		const events = eventType === "GROUPED" ? this.eventsGrouped() : this.eventsUngrouped();
 
+		let laneHeight: { [lane: string]: number} = {};
 		for (const event of events) {
 			const element = event.nativeElement;
 
 			if (element.getAttribute('data-resource-id') !== resourceId) {
 				continue;
 			}
+		
+			let lane = element.getAttribute('data-lane');
 
-			height += element.clientHeight;
+			if(!lane) {
+				continue;
+			}
+
+			if(!laneHeight[lane]) {
+				laneHeight[lane] = element.clientHeight;
+				continue;
+			}
+
+			if(laneHeight[lane] < element.clientHeight) {
+				laneHeight[lane] = element.clientHeight;
+			}
+		}
+
+		for(let [_, value] of Object.entries(laneHeight)) {
+			height += value;
 		}
 
 		if (height == 0) {
 			if (!this.calendarSettings().enableResourceCollapse || !collapsed.has(resourceId)) {
-				height = 48;
+					height = eventTemplate ? 28 : 48;
 			} else {
 				height = 28;
 			}
