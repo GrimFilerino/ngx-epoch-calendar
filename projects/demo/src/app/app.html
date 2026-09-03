@@ -1,3 +1,7 @@
 <ngx-epochx-date-header class="w-full block" [(date)]="date"></ngx-epochx-date-header>
 <br>
-<ngx-epochx-day-calendar #calendar class="flex flex-row overflow-scroll" [calendarSettings]="myCalendarSettings" [date]="date()" [resources]="resources()" [resourceGroups]="resourceGroups()" [events]="events()"></ngx-epochx-day-calendar>
+
+
+<div class="container overflow-auto h-96">
+	<ngx-epochx-day-calendar #calendar [calendarSettings]="myCalendarSettings" [date]="date()" [resources]="resources()" [resourceGroups]="resourceGroups()" [events]="events()"></ngx-epochx-day-calendar>
+</div>

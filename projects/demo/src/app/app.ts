@@ -35,6 +35,46 @@ export class App {
 				maxSlots: 1000,
 				removeSlots: true
 			},
+		},
+		{
+			id: "6",
+			title: "#1",
+		},
+		{
+			id: "8",
+			title: "#2",
+		},
+		{
+			id: "9",
+			title: "#3",
+		},
+		{
+			id: "12",
+			title: "#1",
+		},
+		{
+			id: "19",
+			title: "#2",
+		},
+		{
+			id: "40",
+			title: "#3",
+		},
+		{
+			id: "18",
+			title: "#3",
+		},
+		{
+			id: "16",
+			title: "#1",
+		},
+		{
+			id: "62",
+			title: "#2",
+		},
+		{
+			id: "64",
+			title: "#3",
 		}
 	]);
 
@@ -43,19 +83,26 @@ export class App {
 			title: "Testberg 1",
 			id: "001",
 			resourceId: "1",
-			startDate: new Date(`2026-09-01T13:00`),
-			endDate: new Date(`2026-09-01T15:05`),
+			startDate: new Date(),
+			endDate: new Date(),
 			slots:0,
 		},
 		{
 			title: "Testberg 2",
 			id: "011",
 			resourceId: "3",
-			startDate: new Date(`2026-09-01T12:00`),
-			endDate: new Date(`2026-09-01T16:00`),
+			startDate: new Date(),
+			endDate: new Date(),
+			slots:10,
+		},
+		{
+			title: "Testberg 2",
+			id: "011",
+			resourceId: "62",
+			startDate: new Date(),
+			endDate: new Date(),
 			slots:0,
 		},
-
 	]);
 
 	date = signal(new Date());
