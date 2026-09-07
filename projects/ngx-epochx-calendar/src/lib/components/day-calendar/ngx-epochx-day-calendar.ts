@@ -301,9 +301,15 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 			return next;
 		});
 
-		if(skipChangeDetection) {
+		if (!skipChangeDetection) {
 			this.cdr.detectChanges();
+			this.updateResourceListZIndex();
 		}
+	}
+
+	public refreshCalendar() {
+		this.cdr.detectChanges();
+		this.updateResourceListZIndex();
 	}
 
 	public getTimeslotBusinessHour(time: TimeSlot): any {
@@ -387,14 +393,22 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 			slots = resource?.availability?.maxSlots;
 		}
 
+
 		let events = this.events().filter(event => event.resourceId == resourceId);
-		let date = DateTime.fromJSDate(convertTimeSlotToDate(time, DateTime.fromJSDate(this.date()).day.toString()));
+		
+		let [hour, min] = time.split(":").map(Number);
+		let date = DateTime.fromJSDate(this.date()).set({
+			hour,
+			minute: min,
+			second:0,
+			millisecond:0
+		});
 
 		for (let event of events) {
 			let startDate = DateTime.fromJSDate(event.startDate);
 			let endDate = DateTime.fromJSDate(event.endDate);
 
-			if (startDate < date && date < endDate) {
+			if (startDate <= date && date < endDate) {
 
 				if (!resource.availability?.removeSlots) {
 					slots += event.slots ?? 0;

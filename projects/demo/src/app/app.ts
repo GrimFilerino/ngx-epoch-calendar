@@ -91,8 +91,8 @@ export class App {
 			title: "Testberg 2",
 			id: "011",
 			resourceId: "3",
-			startDate: new Date(),
-			endDate: new Date(),
+			startDate: new Date("2026-09-03 15:00"),
+			endDate: new Date("2026-09-03 16:30"),
 			slots:10,
 		},
 		{
