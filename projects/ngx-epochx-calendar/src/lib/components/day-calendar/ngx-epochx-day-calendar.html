@@ -30,7 +30,10 @@ Copyright (c) 2026 Grimfilerino
 							<span>{{ resource.title }}</span>
 						</div>
 					} @else {
-						<ng-container *ngTemplateOutlet="resourceTemplate(); context:resource"></ng-container>
+						<ng-container *ngTemplateOutlet="resourceTemplate(); context:{
+							$implicit: resource,
+							collapsed: collapsedResources().has(resource.id)
+						}"></ng-container>
 					}
 				</div>
             }
@@ -64,7 +67,12 @@ Copyright (c) 2026 Grimfilerino
 								<span class="text">{{ resource.title }}</span>
 							</div>
 						} @else {
-                            <ng-container *ngTemplateOutlet="resourceTemplate(); context:resource"></ng-container>
+								<ng-container *ngTemplateOutlet="eventTemplate(); context: context: {
+									$implicit: event,
+									title: event.title,
+									resourceId: event.resourceId,
+									collapsed: collapsedResources().has(event.resourceId)
+								}"></ng-container>
 						}
                     </div>
                     }
@@ -128,7 +136,12 @@ Copyright (c) 2026 Grimfilerino
 									<span class="text-xs text">{{event.subTitle}}</span>
 								</div>
 							} @else {
-								<ng-container *ngTemplateOutlet="eventTemplate(); context:event"></ng-container>
+								<ng-container *ngTemplateOutlet="eventTemplate(); context: context: {
+									$implicit: event,
+									title: event.title,
+									resourceId: event.resourceId,
+									collapsed: collapsedResources().has(event.resourceId)
+								}"></ng-container>
 							}
                         </div>
 						}
