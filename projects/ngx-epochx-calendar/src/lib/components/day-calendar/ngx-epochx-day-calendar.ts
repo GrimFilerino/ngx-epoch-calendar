@@ -103,11 +103,15 @@ export class NgxEpochxDayCalendar implements OnInit, AfterViewInit, OnDestroy {
 
 	constructor() {
 		effect(() => {
-			if (this.date() && this.events() && this._hasRendered()) {
-				this.eventsAtCurrentDate.set(this.events().filter(
+			const date = this.date();
+			const events = this.events();
+			const rendered = this._hasRendered();
+
+			if (date && events && rendered) {
+				this.eventsAtCurrentDate.set(events.filter(
 					(event: CalendarEvent) => {
-						return DateTime.fromJSDate(event.startDate).hasSame(DateTime.fromJSDate(this.date()), "day")
-							|| DateTime.fromJSDate(event.endDate).hasSame(DateTime.fromJSDate(this.date()), "day");
+						return DateTime.fromJSDate(event.startDate).hasSame(DateTime.fromJSDate(date), "day")
+							|| DateTime.fromJSDate(event.endDate).hasSame(DateTime.fromJSDate(date), "day");
 					})
 					.map((event) => Object.assign({}, event, { lane: 0 }, { style: this.getEventStyle(event) })));
 				this.calculateBusinessHours();
